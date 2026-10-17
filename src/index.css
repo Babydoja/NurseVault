@@ -1,0 +1,56 @@
+@import "tailwindcss";
+@theme {
+  --color-navy: #0f2a4a;
+  --color-navy-soft: #1d4272;
+  --color-sky: #e7f0fa;
+  --color-sky-deep: #a9cbea;
+  --color-mist: #f3f5f8;
+  --color-slate: #5b6676;
+  --color-line: #d9dfe7;
+  --font-sans: "Figtree", system-ui, sans-serif;
+  --font-serif: "Newsreader", Georgia, serif;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.125rem;
+  --shadow-sm: 0 1px 2px rgb(15 42 74 / 0.06), 0 2px 6px rgb(15 42 74 / 0.05);
+  --shadow-md: 0 8px 24px -8px rgb(15 42 74 / 0.22);
+  --shadow-xl: 0 24px 48px -16px rgb(5 20 45 / 0.45);
+}
+body { @apply bg-mist text-navy font-sans antialiased; }
+h1, h2, h3 { text-wrap: balance; }
+h1 { font-family: var(--font-serif); letter-spacing: -0.01em; }
+:focus-visible { outline: 3px solid var(--color-navy-soft); outline-offset: 2px; }
+
+.btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-lg bg-navy px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition cursor-pointer hover:bg-navy-soft active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50; }
+.btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm font-semibold text-navy transition cursor-pointer hover:bg-sky active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50; }
+.btn-lg { @apply px-6 py-3 text-base; }
+.btn-light { @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-base font-semibold shadow-md transition cursor-pointer active:translate-y-px; background: #fff; color: #0f2a4a; }
+.btn-light:hover { background: #e7f0fa; }
+.btn-outline-light { @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-base font-semibold transition cursor-pointer; color: #fff; border: 1px solid rgb(255 255 255 / 0.35); }
+.btn-outline-light:hover { background: rgb(255 255 255 / 0.1); }
+.field { @apply w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-sm shadow-sm transition placeholder:text-slate/70 focus:border-navy-soft; }
+.badge { @apply inline-block rounded-full bg-sky px-2.5 py-0.5 text-xs font-semibold text-navy-soft; }
+.card { @apply rounded-xl border border-line bg-white shadow-sm; }
+
+/* Question "paper": navy margin rule, like an exam sheet */
+.paper { background: var(--color-white); border: 1px solid var(--color-line); border-left: 4px solid var(--color-navy); border-radius: 0.625rem; box-shadow: var(--shadow-sm); }
+.q-text { font-family: var(--font-serif); font-size: 1.2rem; line-height: 1.6; max-width: 65ch; }
+
+/* Branded bands. Fixed colours so they look the same in light and dark mode. */
+.hero { position: relative; overflow: hidden; color: #fff;
+  background: radial-gradient(900px 380px at 88% -10%, #2f6199 0%, transparent 60%), linear-gradient(135deg, #0b2240 0%, #12365f 55%, #1d4272 100%); }
+.hero-pattern::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M24 18v12M18 24h12' stroke='%23ffffff' stroke-opacity='.07' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.hero > * { position: relative; }
+.footer-dark { background: #0b2240; color: #cfe0f5; }
+.footer-dark a:hover { color: #fff; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* Palettes. [data-theme="light"] on a nested element keeps that block light inside dark mode. */
+[data-theme="light"] { --color-navy: #0f2a4a; --color-navy-soft: #1d4272; --color-sky: #e7f0fa; --color-sky-deep: #a9cbea; --color-mist: #f3f5f8; --color-slate: #5b6676; --color-line: #d9dfe7; --color-white: #ffffff; color-scheme: light; }
+[data-theme="dark"] {
+  --color-navy: #e6edf7; --color-navy-soft: #8fb8ea; --color-sky: #1b3153; --color-sky-deep: #2b4b78;
+  --color-mist: #0b1626; --color-slate: #9db0c8; --color-line: #2a4062; --color-white: #12233d;
+  color-scheme: dark;
+}
