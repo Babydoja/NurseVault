@@ -22,8 +22,8 @@ import { Analytics } from '@vercel/analytics/react';
 const P = ({ children, admin, staff }) => <RequireAuth admin={admin} staff={staff}>{children}</RequireAuth>
 export default function App() {
   return (
+    <>
     <Routes>
-      <Analytics />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Auth mode="login" />} />
@@ -45,5 +45,8 @@ export default function App() {
         <Route path="/admin" element={<P staff><Admin /></P>} />
       </Route>
     </Routes>
+
+    <Analytics />
+    </>
   )
 }
