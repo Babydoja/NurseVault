@@ -18,10 +18,12 @@ import AttemptReview from './pages/AttemptReview.jsx'
 import Privacy from './pages/Privacy.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
+import { Analytics } from '@vercel/analytics/react';
 const P = ({ children, admin, staff }) => <RequireAuth admin={admin} staff={staff}>{children}</RequireAuth>
 export default function App() {
   return (
     <Routes>
+      <Analytics />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Auth mode="login" />} />
