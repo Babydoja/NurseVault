@@ -1,7 +1,9 @@
 // Mock data. Replace with Supabase queries in Phase 2/3.
 export const levels = ['100','200','300','400','500']
 export const semesters = ['First','Second']
-export const sessions = ['2021/2022','2022/2023','2023/2024','2024/2025']
+const thisYear = new Date().getFullYear()
+// Sessions are generated (newest first), so nobody has to maintain this list: 2026/2027, 2025/2026, ... 2010/2011
+export const sessions = Array.from({ length: thisYear - 2009 }, (_, i) => `${thisYear - i}/${thisYear - i + 1}`)
 export const questions = [
  {id:1,course:'NSG 211',title:'Fundamentals of Nursing',level:'200',semester:'First',session:'2023/2024',topic:'Vital signs',text:'Which of the following is the normal adult resting pulse rate range?',options:['40–60 bpm','60–100 bpm','100–120 bpm','120–140 bpm'],answer:1,verified:true,source:'Student recall'},
  {id:2,course:'NSG 211',title:'Fundamentals of Nursing',level:'200',semester:'First',session:'2022/2023',topic:'Infection control',text:'The single most effective measure for preventing hospital-acquired infection is:',options:['Wearing gloves always','Hand hygiene','Isolation of all patients','Routine antibiotics'],answer:1,verified:true,source:'Lecturer-approved'},

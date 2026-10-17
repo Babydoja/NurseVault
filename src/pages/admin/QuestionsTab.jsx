@@ -19,7 +19,8 @@ export default function QuestionsTab() {
     setErr(''); setRows(data)
   }, [term, status])
   useEffect(() => { load() }, [load])
-  useEffect(() => { supabase.from('courses').select('id,code,title').order('code').then(({ data }) => setCourses(data || [])) }, [])
+  const [topicList, setTopicList] = useState([])
+  useEffect(() => { supabase.from('courses').select('id,code,title').order('code').then(({ data }) => setCourses(data || [])); supabase.rpc('list_topics').then(({ data }) => setTopicList(data || [])) }, [])
 
   const edit = q => {
     const opts = [...q.answer_options].sort((a, b) => a.position - b.position)
@@ -71,7 +72,7 @@ export default function QuestionsTab() {
             <label className="grid gap-1 text-sm font-medium">Session<select className="field" required value={form.session} onChange={e => up('session', e.target.value)}><option value="">Choose</option>{sessions.map(s => <option key={s}>{s}</option>)}</select></label>
             <label className="grid gap-1 text-sm font-medium">Status<select className="field" value={form.status} onChange={e => up('status', e.target.value)}><option value="published">Published</option><option value="draft">Draft</option><option value="archived">Archived</option></select></label>
           </div>
-          <label className="grid gap-1 text-sm font-medium">Topic (optional)<input className="field" value={form.topic} onChange={e => up('topic', e.target.value)} /></label>
+          <label className="grid gap-1 text-sm font-medium">Topic (optional, reuse an existing name where you can)<input className="field" list="topic-options" value={form.topic} onChange={e => up('topic', e.target.value)} /><datalist id="topic-options">{topicList.map(t => <option key={t} value={t} />)}</datalist></label>
           <label className="grid gap-1 text-sm font-medium">Question<textarea className="field" rows={3} required value={form.body} onChange={e => up('body', e.target.value)} /></label>
           <label className="grid gap-1 text-sm font-medium">Explanation shown with the answer (optional)<textarea className="field" rows={2} value={form.explanation} onChange={e => up('explanation', e.target.value)} /></label>
           <div className="grid gap-1 text-sm font-medium">Image (optional, under 5 MB)

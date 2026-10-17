@@ -4,6 +4,7 @@ import Overview from './admin/Overview.jsx'
 import Submissions from './admin/Submissions.jsx'
 import VerifyTab from './admin/VerifyTab.jsx'
 import Reports from './admin/Reports.jsx'
+import CoursesTab from './admin/CoursesTab.jsx'
 import QuestionsTab from './admin/QuestionsTab.jsx'
 import ImportTab from './admin/ImportTab.jsx'
 import MaterialsTab from './admin/MaterialsTab.jsx'
@@ -14,7 +15,7 @@ export default function Admin() {
   const tabs = [
     ...(isAdmin ? [['overview', 'Overview', Overview]] : []),
     ['subs', 'Submissions', Submissions], ['verify', 'Verify answers', VerifyTab], ['reports', 'Reports', Reports],
-    ...(isAdmin ? [['qs', 'Questions', QuestionsTab], ['import', 'Import', ImportTab], ['materials', 'Materials', MaterialsTab], ['history', 'History', History], ['users', 'Users', UsersTab]] : [])]
+    ...(isAdmin ? [['courses', 'Courses', CoursesTab], ['qs', 'Questions', QuestionsTab], ['import', 'Import', ImportTab], ['materials', 'Materials', MaterialsTab], ['history', 'History', History], ['users', 'Users', UsersTab]] : [])]
   const [t, setT] = useState(tabs[0][0])
   const Active = tabs.find(x => x[0] === t)[2]
   return (
