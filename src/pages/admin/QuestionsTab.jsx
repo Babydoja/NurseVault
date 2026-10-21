@@ -20,6 +20,7 @@ export default function QuestionsTab() {
   }, [term, status])
   useEffect(() => { load() }, [load])
   const [topicList, setTopicList] = useState([])
+  const [sel, setSel] = useState({}), [bulk, setBulk] = useState(''), [bulkCourse, setBulkCourse] = useState(''), [info, setInfo] = useState('')
   useEffect(() => { supabase.from('courses').select('id,code,title').order('code').then(({ data }) => setCourses(data || [])); supabase.rpc('list_topics').then(({ data }) => setTopicList(data || [])) }, [])
 
   const edit = q => {
@@ -52,6 +53,17 @@ export default function QuestionsTab() {
     const { error } = await supabase.from('questions').delete().eq('id', q.id)
     if (error) return setErr(error.message)
     load()
+  }
+  const ids = Object.keys(sel).filter(k => sel[k] && (rows || []).some(r => r.id === k))
+  const runBulk = async () => {
+    if (!ids.length || !bulk) return
+    if (bulk === 'move' && !bulkCourse) return setErr('Choose the course to move them to.')
+    if (bulk === 'delete' && !window.confirm(`Delete ${ids.length} question${ids.length !== 1 ? 's' : ''} permanently? Practice records for them are removed too. Archive instead if you only want to hide them.`)) return
+    setErr(''); setInfo('')
+    const { data, error } = await supabase.rpc('admin_bulk_questions', { p_ids: ids, p_action: bulk, p_course: bulkCourse || null })
+    if (error) return setErr(error.message)
+    setInfo(`Done. ${data} question${data !== 1 ? 's' : ''} updated.${bulk === 'verify' && data < ids.length ? ' Questions without a correct answer were skipped.' : ''}`)
+    setSel({}); setBulk(''); load()
   }
   const up = (k, v) => setForm({ ...form, [k]: v })
   const setOpt = (i, v) => up('opts', form.opts.map((o, k) => (k === i ? v : o)))
@@ -101,12 +113,25 @@ export default function QuestionsTab() {
         <select className="field w-auto" aria-label="Status" value={status} onChange={e => setStatus(e.target.value)}><option value="">Any status</option><option value="published">Published</option><option value="draft">Draft</option><option value="archived">Archived</option></select>
         <button className="btn-ghost">Search</button>
       </form>
+      {info && <p className="mt-3 rounded-lg bg-sky p-3 text-sm" role="status">{info}</p>}
+      {rows && rows.length > 0 && (
+        <div className="card mt-3 flex flex-wrap items-center gap-2 p-3 text-sm">
+          <label className="flex items-center gap-2"><input type="checkbox" checked={ids.length === rows.length} onChange={e => setSel(e.target.checked ? Object.fromEntries(rows.map(r => [r.id, true])) : {})} />Select all shown</label>
+          <span className="text-slate">{ids.length} selected</span>
+          <select className="field w-auto" aria-label="Bulk action" value={bulk} onChange={e => setBulk(e.target.value)}>
+            <option value="">Choose action</option><option value="publish">Publish</option><option value="draft">Move to draft</option><option value="archive">Archive</option>
+            <option value="verify">Mark answers verified</option><option value="unverify">Remove verification</option><option value="move">Move to another course</option><option value="delete">Delete</option>
+          </select>
+          {bulk === 'move' && <select className="field w-auto" aria-label="Target course" value={bulkCourse} onChange={e => setBulkCourse(e.target.value)}><option value="">Course</option>{courses.map(c => <option key={c.id} value={c.id}>{c.code}</option>)}</select>}
+          <button className="btn-primary" disabled={!ids.length || !bulk} onClick={runBulk}>Apply</button>
+        </div>
+      )}
       {!rows && !err && <p className="mt-3 text-sm text-slate">Loading…</p>}
       {rows && !rows.length && <p className="mt-3 text-sm text-slate">No questions found.</p>}
       <ul className="mt-3 grid gap-3">
         {(rows || []).map(q => (
           <li key={q.id} className="paper p-4">
-            <div className="flex flex-wrap gap-2 text-xs"><span className="badge">{q.courses.code}</span><span className="badge">{q.session}</span><span className="badge">{q.status}</span><span className="badge">{q.answer_verified ? 'verified' : 'unverified'}</span></div>
+            <div className="flex flex-wrap items-center gap-2 text-xs"><input type="checkbox" aria-label="Select question" checked={!!sel[q.id]} onChange={e => setSel({ ...sel, [q.id]: e.target.checked })} /><span className="badge">{q.courses.code}</span><span className="badge">{q.session}</span><span className="badge">{q.status}</span><span className="badge">{q.answer_verified ? 'verified' : 'unverified'}</span></div>
             <p className="mt-2 text-sm">{q.body}</p>
             <div className="mt-3 flex gap-2"><button className="btn-ghost" onClick={() => edit(q)}>Edit</button><button className="btn-ghost" onClick={() => del(q)}>Delete</button></div>
           </li>

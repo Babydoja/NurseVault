@@ -9,6 +9,9 @@ const P = {
   clock: 'M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z',
   check: 'M5 12l5 5L20 7',
   cross: 'M12 5v14M5 12h14',
+  flame: 'M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-8z',
+  bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0',
+  cards: 'M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5',
   inbox: 'M3 13l3-8h12l3 8M3 13v6h18v-6M3 13h5l1 3h6l1-3h5',
 }
 export const Icon = ({ name, className = 'h-5 w-5' }) => (

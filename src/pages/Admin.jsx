@@ -10,12 +10,14 @@ import ImportTab from './admin/ImportTab.jsx'
 import MaterialsTab from './admin/MaterialsTab.jsx'
 import History from './admin/History.jsx'
 import UsersTab from './admin/UsersTab.jsx'
+import TermsTab from './admin/TermsTab.jsx'
+import Recognition from './admin/Recognition.jsx'
 export default function Admin() {
   const { isAdmin } = useAuth()
   const tabs = [
     ...(isAdmin ? [['overview', 'Overview', Overview]] : []),
-    ['subs', 'Submissions', Submissions], ['verify', 'Verify answers', VerifyTab], ['reports', 'Reports', Reports],
-    ...(isAdmin ? [['courses', 'Courses', CoursesTab], ['qs', 'Questions', QuestionsTab], ['import', 'Import', ImportTab], ['materials', 'Materials', MaterialsTab], ['history', 'History', History], ['users', 'Users', UsersTab]] : [])]
+    ['subs', 'Submissions', Submissions], ['verify', 'Verify answers', VerifyTab], ['reports', 'Reports', Reports], ['recognition', 'Contributors', Recognition],
+    ...(isAdmin ? [['courses', 'Courses', CoursesTab], ['qs', 'Questions', QuestionsTab], ['import', 'Import', ImportTab], ['materials', 'Materials', MaterialsTab], ['terms', 'Flashcards', TermsTab], ['history', 'History', History], ['users', 'Users', UsersTab]] : [])]
   const [t, setT] = useState(tabs[0][0])
   const Active = tabs.find(x => x[0] === t)[2]
   return (

@@ -16,13 +16,14 @@ import Saved from './pages/Saved.jsx'
 import MySubmissions from './pages/MySubmissions.jsx'
 import AttemptReview from './pages/AttemptReview.jsx'
 import Privacy from './pages/Privacy.jsx'
+import Notifications from './pages/Notifications.jsx'
+import Flashcards from './pages/Flashcards.jsx'
+import Offline from './pages/Offline.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
-import { Analytics } from '@vercel/analytics/react'
 const P = ({ children, admin, staff }) => <RequireAuth admin={admin} staff={staff}>{children}</RequireAuth>
 export default function App() {
   return (
-    <>
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
@@ -30,6 +31,9 @@ export default function App() {
         <Route path="/register" element={<Auth mode="register" />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/offline" element={<Offline />} />
+        <Route path="/notifications" element={<P><Notifications /></P>} />
+        <Route path="/flashcards" element={<P><Flashcards /></P>} />
         <Route path="/topics" element={<P><Topics /></P>} />
         <Route path="/saved" element={<P><Saved /></P>} />
         <Route path="/my-submissions" element={<P><MySubmissions /></P>} />
@@ -45,7 +49,5 @@ export default function App() {
         <Route path="/admin" element={<P staff><Admin /></P>} />
       </Route>
     </Routes>
-    <Analytics />
-    </>
   )
 }

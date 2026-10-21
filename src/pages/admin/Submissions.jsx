@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase.js'
 const letter = k => String.fromCharCode(65 + k)
 export default function Submissions() {
   const [items, setItems] = useState(null), [courses, setCourses] = useState([]), [err, setErr] = useState('')
-  const [verify, setVerify] = useState({}), [dups, setDups] = useState({}), [ed, setEd] = useState(null)
+  const [verify, setVerify] = useState({}), [dups, setDups] = useState({}), [ed, setEd] = useState(null), [chk, setChk] = useState({}), [bulkMsg, setBulkMsg] = useState('')
   const load = useCallback(async () => {
     const [s, c] = await Promise.all([
       supabase.from('question_submissions').select('*, courses(code), profiles!submitted_by(full_name)').eq('status', 'pending').order('created_at'),
@@ -17,6 +17,24 @@ export default function Submissions() {
   const approve = i => run(supabase.rpc('approve_submission', { p_submission: i.id, p_verified: !!verify[i.id] }))
   const reject = i => { const note = window.prompt('Reason for rejecting (the student will see this)'); if (note !== null) run(supabase.rpc('reject_submission', { p_submission: i.id, p_note: note || null })) }
   const check = async i => { const { data } = await supabase.rpc('similar_questions', { p_text: i.question_text }); setDups({ ...dups, [i.id]: data || [] }) }
+  const picked = (items || []).filter(i => chk[i.id])
+  const bulkApprove = async () => {
+    let ok = 0, skip = 0; setErr(''); setBulkMsg('')
+    for (const i of picked) {
+      if (!i.course_id) { skip++; continue }
+      const { error } = await supabase.rpc('approve_submission', { p_submission: i.id, p_verified: false })
+      if (error) { setErr(error.message); break }
+      ok++
+    }
+    setChk({}); setBulkMsg(`Approved ${ok}.${skip ? ` Skipped ${skip} with no course assigned.` : ''}`); load()
+  }
+  const bulkReject = async () => {
+    const note = window.prompt(`Reason for rejecting ${picked.length} submission${picked.length !== 1 ? 's' : ''} (students will see this)`)
+    if (note === null) return
+    setErr(''); setBulkMsg('')
+    for (const i of picked) { const { error } = await supabase.rpc('reject_submission', { p_submission: i.id, p_note: note || null }); if (error) { setErr(error.message); break } }
+    setChk({}); setBulkMsg(`Rejected ${picked.length}.`); load()
+  }
   const startEdit = i => setEd({ id: i.id, text: i.question_text, opts: i.options.join('\n'), topic: i.topic || '', proposed: i.proposed_answer === null ? '' : String(i.proposed_answer) })
   const optList = ed => ed.opts.split('\n').map(x => x.trim()).filter(Boolean)
   const saveEdit = async () => {
@@ -29,11 +47,21 @@ export default function Submissions() {
     <div>
       <h2 className="font-semibold">Submissions to review</h2>
       {err && <p className="mt-3 rounded-md bg-mist p-3 text-sm" role="alert">{err}</p>}
+      {bulkMsg && <p className="mt-3 rounded-lg bg-sky p-3 text-sm" role="status">{bulkMsg}</p>}
+      {items && items.length > 0 && (
+        <div className="card mt-3 flex flex-wrap items-center gap-2 p-3 text-sm">
+          <label className="flex items-center gap-2"><input type="checkbox" checked={picked.length === items.length} onChange={e => setChk(e.target.checked ? Object.fromEntries(items.map(i => [i.id, true])) : {})} />Select all</label>
+          <span className="text-slate">{picked.length} selected</span>
+          <button className="btn-primary" disabled={!picked.length} onClick={bulkApprove}>Approve selected</button>
+          <button className="btn-ghost" disabled={!picked.length} onClick={bulkReject}>Reject selected</button>
+        </div>
+      )}
       {!items && !err && <p className="mt-3 text-sm text-slate">Loading…</p>}
       {items && !items.length && <p className="mt-3 text-sm text-slate">Nothing waiting for review.</p>}
       <ul className="mt-3 grid gap-3">
         {(items || []).map(i => (
           <li key={i.id} className="paper p-4">
+            <label className="mb-2 flex items-center gap-2 text-sm"><input type="checkbox" checked={!!chk[i.id]} onChange={e => setChk({ ...chk, [i.id]: e.target.checked })} />Select</label>
             <p className="text-sm text-slate">{i.session}{i.topic ? ` · ${i.topic}` : ''}{i.profiles?.full_name ? ` · from ${i.profiles.full_name}` : ''}</p>
             <p className="q-text mt-1">{i.question_text}</p>
             <ol className="mt-2 text-sm">{i.options.map((o, k) => <li key={k} className={k === i.proposed_answer ? 'font-semibold' : ''}>{letter(k)}. {o}{k === i.proposed_answer && ' (proposed answer)'}</li>)}</ol>
